@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "ask-riley": {
+            "command": "/Users/rileyglusker/Library/pnpm/bin/pnpm",
+            "args": [
+                "--silent",
+                "--filter",
+                "@ask-riley/mcp",
+                "dev"
+            ],
+            "env": {
+                "PATH": "/Users/rileyglusker/Library/pnpm/bin:/usr/bin:/bin"
+            }
+        }
+    }
+}

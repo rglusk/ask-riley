@@ -1,0 +1,141 @@
+{
+    "profile": {
+        "name": "Riley Glusker",
+        "headline": "Staff Frontend Engineer at Airbnb (Messaging)",
+        "summary": "Staff frontend engineer specializing in messaging products, server-driven UI platforms, streaming interfaces, and AI trust patterns. At Airbnb since 2019; previously Goldman Sachs."
+    },
+    "contact": {
+        "name": "Riley Glusker",
+        "email": "riley.glusker@gmail.com",
+        "linkedIn": "linkedin.com/in/rileyglusker",
+        "location": {
+            "city": "San Francisco, CA",
+            "mostLikelyFoundAt": [
+                "at a horror movie screening",
+                "at a pub quiz somewhere",
+                "wandering a city park",
+                "in a neighborhood coffee shop",
+                "browsing a farmers market"
+            ]
+        }
+    },
+    "experience": [
+        {
+            "company": "Airbnb",
+            "team": "Messaging",
+            "title": "Staff Software Engineer",
+            "period": "Sep 2019 - present",
+            "notes": "Promoted to Senior in 2021, Staff in 2026. Interim EM twice: team of 8 (backend + web), 3-month stretches, while continuing to deliver as an IC."
+        },
+        {
+            "company": "Goldman Sachs",
+            "title": "Software Engineer",
+            "period": "2014 - 2019"
+        }
+    ],
+    "projects": [
+        {
+            "id": "messaging-cards",
+            "name": "Messaging Cards platform",
+            "role": "Creator and tech lead",
+            "description": "Airbnb's composable cross-platform card platform (web, iOS, Android) — a server-driven UI system that became the default integration path for teams building in Messaging. Patent pending. Includes a self-serve sandbox and card-builder tooling so partner teams can ship without frontend engineers.",
+            "highlights": [
+                "Adopted by many products across a dozen-plus partner teams",
+                "Serves hundreds of thousands of cards per day",
+                "Patent pending",
+                "A backend-only team's first card drove a double-digit lift in reservation alterations and a meaningful drop in support contacts"
+            ],
+            "metrics": [
+                { "value": "100Ks", "label": "cards served daily" },
+                { "value": "dozens", "label": "products and partner teams on the platform" },
+                { "value": "double-digit %", "label": "lift in reservation alterations from a backend-only team's first card" }
+            ]
+        },
+        {
+            "id": "listing-assistant",
+            "name": "\"Ask anything\" listing-page assistant",
+            "role": "Product surface owner and engineering lead",
+            "description": "AI assistant on Airbnb listing pages. Owned the full product surface: UI, intent-recognition display, and trust-preserving error states (no ML modeling work). Demoed live to executive leadership.",
+            "highlights": [
+                "Demoed live to executive leadership",
+                "Introduced trust-preserving error states distinguishing 'no data' from 'no understanding'"
+            ]
+        },
+        {
+            "id": "streaming-ux",
+            "name": "Streaming response UX over WebSockets",
+            "role": "Designer and implementer",
+            "description": "Built a streaming-feel response UI over WebSockets (no SSE available): token chunks are queued per socket event and drained on a timer, progressively rendering text and markdown tables for a smooth streaming experience from bursty transport.",
+            "highlights": [
+                "Chunk-queue pattern smooths bursty WebSocket events into fluid rendering",
+                "Progressive markdown rendering mid-stream, including tables"
+            ]
+        },
+        {
+            "id": "ai-auto-replies",
+            "name": "AI auto-replies for hosts",
+            "role": "Frontend lead",
+            "description": "AI-generated reply suggestions that meaningfully reduced host workload with no negative booking impact.",
+            "metrics": [
+                { "value": "double-digit %", "label": "reduction in inquiries needing a host response" },
+                { "value": "0", "label": "negative booking impact" }
+            ]
+        },
+        {
+            "id": "unified-inbox",
+            "name": "Unified inbox redesign",
+            "role": "Web lead (8 engineers)",
+            "description": "Led the web workstream of Airbnb's unified inbox redesign.",
+            "metrics": [
+                { "value": "big", "label": "growth in web daily active users" },
+                { "value": "fewer", "label": "users needing to file support tickets" }
+            ]
+        },
+        {
+            "id": "inbox-performance",
+            "name": "Inbox performance",
+            "role": "Multi-year performance DRI",
+            "description": "Directly responsible individual for inbox performance across multiple years: introduced inbox pagination and below-the-fold deferral of over-fetching UI. Maintained high test coverage.",
+            "highlights": [
+                "Inbox pagination",
+                "Below-the-fold deferral of over-fetching UI",
+                "High test coverage"
+            ]
+        }
+    ],
+    "aiTrustPatterns": {
+        "summary": "Distinguishes 'no data' (the question was understood but the answer isn't known) from 'no understanding' (the intent couldn't be parsed) so AI products fail honestly instead of guessing. Endorsed internally at Airbnb.",
+        "demonstratedBy": "This very bot classifies every response as answered, no_data, or no_understanding."
+    },
+    "leadership": [
+        "Advised another major company's engineering leadership on server-driven UI architecture",
+        "Member of Airbnb's Web Tech Stack Working Group",
+        "Co-author of logging RFCs",
+        "Intern manager (2025)",
+        "Runs mentorship office hours",
+        "Interim EM twice for a team of 8 while delivering as an IC"
+    ],
+    "skills": [
+        "HTML",
+        "CSS",
+        "TypeScript",
+        "JavaScript",
+        "React",
+        "GraphQL",
+        "Jest",
+        "Storybook",
+        "Cypress",
+        "Figma"
+    ],
+    "education": {
+        "school": "Duke University",
+        "degree": "BS Computer Science, minor in Cultural Anthropology",
+        "notes": "Semester at University College London (UCL)"
+    },
+    "fun": [
+        "Girls Who Code mentor and hackathon coach",
+        "Pub quiz champion (once)",
+        "Avid knitter: a few baby sweaters, many beanies, and many half-constructed adult sweaters",
+        "Deep love of horror films, good and bad — watches pretty much every horror film that comes out"
+    ]
+}
