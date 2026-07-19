@@ -1,9 +1,14 @@
-# Evals — tool routing
+# Evals — tool routing & response shape
 
-Informal behavioral evals for the ask-riley MCP server: each question is run against the
-server in Claude Code, and tool calls are counted from the transcript. Small n, single
-runs — directional, not science. Goal: broad questions answered in 1–2 calls, specific
-questions routed to the right tool first try, out-of-scope questions answered honestly.
+Behavioral evals for the ask-riley bot. Originally manual (questions asked in Claude Code,
+tool calls counted from the transcript); now automated: `pnpm --filter web eval` runs the
+case suite in `apps/web/scripts/eval-cases.ts` through the real agent loop and asserts on
+response SHAPE — tools called, trust state, block types — never exact prose (which is
+non-deterministic). Flags: `--runs=N` for flake rates, `--only=substr`, `--verbose`.
+
+Goal: broad questions answered in 1–2 calls, specific questions routed to the right tool
+first try, out-of-scope questions honestly classified, cards composed per the choreography,
+zero fabricated films/takes/URLs.
 
 ## Question set
 
@@ -29,7 +34,23 @@ Call counts per question, from the Claude Code transcript.
 | 2026-07-17 | baseline: 3 tools (contact, project, search), terse descriptions | Fable 5 (Claude Code) | 9 | | | | | | | | | | 18s churn on Q1 |
 | | + steering descriptions, + get-overview | | | | | | | | | | | | |
 
+## Automated suite results
+
+| Date | Change | Model | Result | Notes |
+|------|--------|-------|--------|-------|
+| 2026-07-19 | first run: 12 cases (envelope era: system prompt + cards) | Sonnet 5 (API) | 9/12 | fallback fired 4×; failures masked by fallback |
+| 2026-07-19 | max_tokens 1000 → 4000 | Sonnet 5 (API) | 11/12 | truncation was corrupting multi-card envelopes |
+| 2026-07-19 | restaurants case re-run --runs=3 | Sonnet 5 (API) | 3/3 | earlier failure was a low-frequency flake |
+
 ## Observations
 
 - Baseline Q1: with no overview tool and terse descriptions, the model crawled the whole
   graph (search + get-project × all projects + contact) to answer a broad question.
+- After steering descriptions + get-overview + system-prompt choreography: broad questions
+  route to get-overview in 1 call; "tonight" movie asks produce exactly one movie_card.
+- max_tokens=1000 silently truncated multi-card JSON envelopes mid-stream; the fallback
+  wrapped the stumps as degraded text, masking the real failure as "answered". Evals
+  surfaced in one run what manual testing had missed entirely. Fix: 4000 + a truncation
+  warning log in the loop.
+- Taste-match case routes correctly but is call-happy (get-favorites × 3 in one run) —
+  candidate for description tuning or a maxToolCalls tightening later.

@@ -47,9 +47,18 @@
                 "A backend-only team's first card drove a double-digit lift in reservation alterations and a meaningful drop in support contacts"
             ],
             "metrics": [
-                { "value": "100Ks", "label": "cards served daily" },
-                { "value": "dozens", "label": "products and partner teams on the platform" },
-                { "value": "double-digit %", "label": "lift in reservation alterations from a backend-only team's first card" }
+                {
+                    "value": "100Ks",
+                    "label": "cards served daily"
+                },
+                {
+                    "value": "dozens",
+                    "label": "products and partner teams on the platform"
+                },
+                {
+                    "value": "double-digit %",
+                    "label": "lift in reservation alterations from a backend-only team's first card"
+                }
             ]
         },
         {
@@ -78,8 +87,14 @@
             "role": "Frontend lead",
             "description": "AI-generated reply suggestions that meaningfully reduced host workload with no negative booking impact.",
             "metrics": [
-                { "value": "double-digit %", "label": "reduction in inquiries needing a host response" },
-                { "value": "0", "label": "negative booking impact" }
+                {
+                    "value": "double-digit %",
+                    "label": "reduction in inquiries needing a host response"
+                },
+                {
+                    "value": "0",
+                    "label": "negative booking impact"
+                }
             ]
         },
         {
@@ -88,8 +103,14 @@
             "role": "Web lead (8 engineers)",
             "description": "Led the web workstream of Airbnb's unified inbox redesign.",
             "metrics": [
-                { "value": "big", "label": "growth in web daily active users" },
-                { "value": "fewer", "label": "users needing to file support tickets" }
+                {
+                    "value": "big",
+                    "label": "growth in web daily active users"
+                },
+                {
+                    "value": "fewer",
+                    "label": "users needing to file support tickets"
+                }
             ]
         },
         {
@@ -132,6 +153,54 @@
         "school": "Duke University",
         "degree": "BS Computer Science, minor in Cultural Anthropology",
         "notes": "Semester at University College London (UCL)"
+    },
+    "favorites": {
+        "horrorMovies": [
+            {
+                "title": "Obsession",
+                "year": 2025,
+                "director": "Curry Barker",
+                "summary": "Baron 'Bear' Bailey breaks a novelty charm to force his co-worker Nikki Freeman to love him, but the supernatural compulsion warps her mind into violent obsession, trapping him in a nightmare he cannot wish away.",
+                "themes": [
+                    "Psychological Horror",
+                    "Supernatural",
+                    "Romance"
+                ],
+                "imdbUrl": "https://www.imdb.com/title/tt37287335/",
+                "posterUrl": "/posters/obsession.jpg",
+                "take": null
+            },
+            {
+                "title": "Oddity",
+                "year": 2024,
+                "director": "Damian McCarthy",
+                "summary": "A psychic medium attempts to uncover the truth behind her sister's murder at the site of the crime.",
+                "themes": [
+                    "Supernatural",
+                    "Folk Horror",
+                    "Suspense",
+                    "Mystery",
+                    "Irish"
+                ],
+                "imdbUrl": "https://www.imdb.com/title/tt26470109/",
+                "posterUrl": "/posters/oddity.jpg",
+                "take": null
+            },
+            {
+                "title": "Exhuma",
+                "year": 2024,
+                "director": "Jang Jae-hyun",
+                "summary": "The process of excavating an ominous grave unleashes dreadful consequences buried underneath.",
+                "themes": [
+                    "Folk Horror",
+                    "Korean",
+                    "Supernatural"
+                ],
+                "imdbUrl": "https://www.imdb.com/title/tt27802490/",
+                "posterUrl": "/posters/exhuma.jpg",
+                "take": null
+            }
+        ]
     },
     "fun": [
         "Girls Who Code mentor and hackathon coach",

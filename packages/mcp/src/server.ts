@@ -2,22 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import knowledge from "../data/knowledge.json" with { type: "json" };
 import { z } from "zod";
 
-// stdout is reserved for MCP protocol messages, so timing goes to stderr.
-function withTiming<Args extends unknown[], Result>(
-    name: string,
-    handler: (...args: Args) => Promise<Result>
-) {
-    return async (...args: Args) => {
-        const start = performance.now();
-        try {
-            return await handler(...args);
-        } finally {
-            const durationMs = performance.now() - start;
-            console.error(`[timing] ${name} ${durationMs.toFixed(1)}ms`);
-        }
-    };
-}
-
 export function createMcpServer() {
     const server = new McpServer({
         name: "ask-riley",
@@ -31,9 +15,9 @@ export function createMcpServer() {
             description: "Riley Glusker's contact information: email, LinkedIn, location. Use only when asked how to reach, hire, or meet Riley.",
             inputSchema: {},
         },
-        withTiming("get-contact", async () => ({
+        async () => ({
             content: [{ type: "text", text: JSON.stringify(knowledge.contact, null, 2) }],
-        }))
+        })
     );
 
     server.registerTool(
@@ -43,7 +27,7 @@ export function createMcpServer() {
             description: "Single-call summary of Riley: headline, bio, current role, a condensed list of all projects, leadership highlights, and skills. Use this FIRST for broad questions like 'tell me about Riley' instead of calling get-contact, get-project, and search-experience separately. Follow up with get-project for depth on one specific project.",
             inputSchema: {},
         },
-        withTiming("get-overview", async () => {
+        async () => {
             const overview = {
                 profile: knowledge.profile,
                 currentRole: knowledge.experience[0],
@@ -54,7 +38,7 @@ export function createMcpServer() {
             return {
                 content: [{ type: "text", text: JSON.stringify(overview, null, 2) }],
             };
-        })
+        }
     );
 
     server.registerTool(
@@ -66,7 +50,7 @@ export function createMcpServer() {
                 id: z.enum(knowledge.projects.map((p) => p.id), {}).describe("Which project to fetch"),
             }),
         },
-        withTiming("get-project", async ({ id }: { id: string }) => {
+        async ({ id }: { id: string }) => {
             const project = knowledge.projects.find((p) => p.id === id);
             if (!project) {
                 throw new Error(`Project with ID ${id} not found`);
@@ -74,8 +58,23 @@ export function createMcpServer() {
             return {
                 content: [{ type: "text", text: JSON.stringify(project, null, 2) }]
             };
-        })
+        }
     );
+
+    server.registerTool(
+        "get-favorites",
+        {
+            title: "Get info about Riley's favorite movies",
+            description: "List of Riley's favorite movies with details.",
+            inputSchema: {},
+        },
+        async () => {
+            return {
+                content: [{ type: "text", text: JSON.stringify(knowledge.favorites, null, 2) }]
+            };
+        }
+    );
+
 
     server.registerTool(
         "search-experience",
@@ -86,7 +85,7 @@ export function createMcpServer() {
                 keywords: z.string().describe("Keywords to search for in Riley's experience")
             })
         },
-        withTiming("search-experience", async ({ keywords }: { keywords: string }) => {
+        async ({ keywords }: { keywords: string }) => {
             keywords = keywords.toLowerCase();
             const results = knowledge.projects.filter((proj) =>
                 proj.description.toLowerCase().includes(keywords) || proj.name.toLowerCase().includes(keywords)
@@ -94,7 +93,7 @@ export function createMcpServer() {
             return {
                 content: [{ type: "text", text: JSON.stringify(results, null, 2) }]
             };
-        })
+        }
     )
 
     return server;

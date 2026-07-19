@@ -1,0 +1,17 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "storybook",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": ["--filter", "web", "storybook"],
+            "port": 6006
+        },
+        {
+            "name": "web",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": ["--filter", "web", "dev"],
+            "port": 3000
+        }
+    ]
+}

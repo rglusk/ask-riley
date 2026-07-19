@@ -142,3 +142,8 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 PLAN.md
+
+# licensed fonts — never commit (EULA forbids redistribution of font files)
+apps/web/fonts/*.woff2
+apps/web/fonts/*.woff
+apps/web/fonts/*.otf
