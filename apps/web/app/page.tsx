@@ -166,6 +166,12 @@ export default function Home() {
         if (!el) return;
         if (suppressScrollRef.current) {
             suppressScrollRef.current = false;
+            // the send-time spacer padded a near-full viewport below the question
+            // so it could reach the top while the answer streamed in. The answer
+            // has landed now — collapse the pad so it doesn't leave a trailing
+            // stretch of whitespace under the response. The question stays put
+            // (we don't re-scroll), and it re-expands on the next send.
+            if (spacerRef.current) spacerRef.current.style.height = "0px";
             maybeShowMoreChip(el);
             return;
         }
