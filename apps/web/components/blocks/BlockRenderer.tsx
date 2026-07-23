@@ -3,6 +3,8 @@ import ReactMarkdown from "react-markdown";
 import { MovieCardView } from "./MovieCardView";
 import { ProjectCardView } from "./ProjectCardView";
 import { ContactCardView } from "./ContactCardView";
+import { RestaurantCardView } from "./RestaurantCardView";
+import { LinkCardView } from "./LinkCardView";
 
 // pastel rotation for card runs — index comes from the block's position
 const TONES = [
@@ -33,6 +35,20 @@ export function BlockRenderer({ block, index = 0 }: { block: Block; index?: numb
         case "project_card": {
             const { type, projectId, ...props } = block;
             return <ProjectCardView {...props} rotate={index % 2 === 0 ? -0.8 : 0.7} />;
+        }
+        case "restaurant_card": {
+            const { type, ...props } = block;
+            return (
+                <RestaurantCardView
+                    {...props}
+                    tone={TONES[index % TONES.length]}
+                    rotate={index % 2 === 0 ? 1.1 : -0.9}
+                />
+            );
+        }
+        case "link_card": {
+            const { type, ...props } = block;
+            return <LinkCardView {...props} rotate={index % 2 === 0 ? -1 : 0.9} />;
         }
         case "contact_card": {
             const { type, ...props } = block;

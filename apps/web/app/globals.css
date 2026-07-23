@@ -47,3 +47,19 @@ body {
     color: oklch(20% 0.005 90);
     font-family: var(--font-body);
 }
+
+/* preflight dims placeholders to 50% currentColor — below AA contrast on card */
+::placeholder {
+    color: var(--color-ink-soft);
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

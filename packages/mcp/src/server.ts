@@ -64,8 +64,8 @@ export function createMcpServer() {
     server.registerTool(
         "get-favorites",
         {
-            title: "Get info about Riley's favorite movies",
-            description: "List of Riley's favorite movies with details.",
+            title: "Get Riley's favorites and recommendations",
+            description: "Riley's personal favorites and recommendations, with details and her takes. Currently includes: horror films, San Francisco restaurant recommendations, and tech articles she found interesting. Use for any recommendation or taste question — 'what should I watch tonight', 'where should I eat in SF', 'what has Riley been reading' — and recommend only from what this returns, never inventing recommendations.",
             inputSchema: {},
         },
         async () => {

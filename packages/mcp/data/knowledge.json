@@ -168,7 +168,7 @@
                 ],
                 "imdbUrl": "https://www.imdb.com/title/tt37287335/",
                 "posterUrl": "/posters/obsession.jpg",
-                "take": null
+                "take": "Creepiest movie I've seen in years. Starts tense and doesn't let up. Highly recommend."
             },
             {
                 "title": "Oddity",
@@ -184,7 +184,7 @@
                 ],
                 "imdbUrl": "https://www.imdb.com/title/tt26470109/",
                 "posterUrl": "/posters/oddity.jpg",
-                "take": null
+                "take": "Constant dread and impressive use of one setting for the whole movie. It has a slow start but then gets really scary."
             },
             {
                 "title": "Exhuma",
@@ -198,7 +198,7 @@
                 ],
                 "imdbUrl": "https://www.imdb.com/title/tt27802490/",
                 "posterUrl": "/posters/exhuma.jpg",
-                "take": null
+                "take": "A winding tale that includes a ghost removal business and an awesome Japanese fox ghost."
             },
             {
                 "title": "The Cabin in the Woods",
@@ -213,7 +213,7 @@
                 ],
                 "imdbUrl": "https://www.imdb.com/title/tt1259521/",
                 "posterUrl": "/posters/cabin-in-the-woods.jpg",
-                "take": null
+                "take": "I first saw this in college after taking a Horror Film class and it became a favorite after first watch. It combines all your favorite tropes."
             },
             {
                 "title": "Ready or Not",
@@ -227,7 +227,95 @@
                 ],
                 "imdbUrl": "https://www.imdb.com/title/tt7798634/",
                 "posterUrl": "/posters/ready-or-not.jpg",
-                "take": null
+                "take": "Just a good time. Funny and gross."
+            }
+        ],
+        "restaurants": [
+            {
+                "name": "Aziza",
+                "cuisine": "Cal-Moroccan",
+                "neighborhood": "Outer Richmond",
+                "photoUrl": "/restaurants/aziza.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Aziza+San+Francisco",
+                "note": "The best corn bread and lamb you could ask for. Oh, and get the cous-cous."
+            },
+            {
+                "name": "Thanh Long",
+                "cuisine": "Vietnamese (roast crab & garlic noodles)",
+                "neighborhood": "Outer Sunset",
+                "photoUrl": "/restaurants/thanh-long.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Thanh+Long+San+Francisco",
+                "note": "The OG garlic noodle place in SF. It's expensive but worth it."
+            },
+            {
+                "name": "Lily",
+                "cuisine": "Vietnamese",
+                "neighborhood": "Inner Richmond",
+                "photoUrl": "/restaurants/lily.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Lily+225+Clement+St+San+Francisco",
+                "note": "Their beef salad is a must have."
+            },
+            {
+                "name": "Shanghai Dumpling King",
+                "cuisine": "Shanghainese, soup dumplings",
+                "neighborhood": "Outer Richmond",
+                "photoUrl": "/restaurants/shanghai-dumpling-king.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Shanghai+Dumpling+King+San+Francisco",
+                "note": "My favorite dumpling spot. Decent Zhajiangmian."
+            },
+            {
+                "name": "El Farolito",
+                "cuisine": "Mexican taqueria",
+                "neighborhood": "Mission",
+                "photoUrl": "/restaurants/el-farolito.jpg",
+                "mapsUrl": "https://maps.google.com/?q=El+Farolito+2779+Mission+St+San+Francisco",
+                "note": "Their burritos are the size of a new born baby — what's not to like?"
+            },
+            {
+                "name": "Lavash",
+                "cuisine": "Persian",
+                "neighborhood": "Inner Sunset",
+                "photoUrl": "/restaurants/lavash.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Lavash+San+Francisco",
+                "note": "My old manager (shout out to Mojtaba) always said this was the best Persian restaurant in SF, and I heavily agree with that statement."
+            },
+            {
+                "name": "Arsicault Bakery",
+                "cuisine": "French bakery — croissants",
+                "neighborhood": "Inner Richmond",
+                "photoUrl": "/restaurants/arsicault.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Arsicault+Bakery+San+Francisco",
+                "note": "Get in line early and admire a bunch of really expensive road bikes while you wait to get pastries."
+            },
+            {
+                "name": "Hook Fish Co",
+                "cuisine": "Sustainable fish — tacos & poke",
+                "neighborhood": "Outer Sunset",
+                "photoUrl": "/restaurants/hookfish.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Hook+Fish+Co+San+Francisco",
+                "note": "Can't go wrong with the catch of the day."
+            },
+            {
+                "name": "Saru Sushi Bar",
+                "cuisine": "Sushi",
+                "neighborhood": "Noe Valley",
+                "photoUrl": "/restaurants/saru.jpg",
+                "mapsUrl": "https://maps.google.com/?q=Saru+Sushi+Bar+San+Francisco",
+                "note": "Amazing sushi, great ambiance."
+            }
+        ],
+        "articles": [
+            {
+                "title": "What is Generative UI? Building Agent-Powered Interfaces",
+                "source": "Google Cloud",
+                "url": "https://cloud.google.com/discover/generative-ui",
+                "note": "Generative UI is the industry converging on what Riley built at Airbnb: interfaces composed dynamically by AI from a card/component vocabulary rather than hardcoded screens — exactly the architecture of this bot."
+            },
+            {
+                "title": "Errors + Graceful Failure",
+                "source": "Google PAIR — People + AI Guidebook",
+                "url": "https://pair.withgoogle.com/chapter/errors-failing/",
+                "note": "The research-backed cousin of Riley's 'no data' vs 'no understanding' trust taxonomy: how AI products should fail honestly and give users a path forward."
             }
         ]
     },

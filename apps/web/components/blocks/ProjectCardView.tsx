@@ -13,14 +13,17 @@ export function ProjectCardView({
         <InkFrame radius="16px 22px 18px 24px" background="var(--color-card)" rotate={rotate} className="w-full max-w-105">
             <div className="flex flex-col gap-2 p-4.5">
                 {role && (
-                    <span className="text-[11.5px] uppercase tracking-wider opacity-55">{role}</span>
+                    <span className="text-[11.5px] uppercase tracking-wider opacity-65">{role}</span>
                 )}
-                <h3 className="font-accent italic text-xl leading-snug">{title}</h3>
+                <h2 className="font-accent italic text-xl leading-snug">{title}</h2>
                 <p className="m-0 text-[13.5px] leading-relaxed opacity-80">{summary}</p>
                 {highlights.length > 0 && (
                     <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] opacity-85">
                         {highlights.map((h) => (
-                            <li key={h}>✏️ {h}</li>
+                            <li key={h}>
+                                <span aria-hidden>✏️ </span>
+                                {h}
+                            </li>
                         ))}
                     </ul>
                 )}

@@ -20,7 +20,7 @@ export function ContactCardView({
                 {reason && <p className="m-0 text-[13px] italic opacity-70">{reason}</p>}
                 {rows.map((row) => (
                     <div key={row.label} className="flex flex-col">
-                        <span className="text-[11.5px] uppercase tracking-wider opacity-55">{row.label}</span>
+                        <span className="text-[11.5px] uppercase tracking-wider opacity-65">{row.label}</span>
                         {row.href ? (
                             <a href={row.href} className="text-[15px] font-semibold hover:underline">
                                 {row.value}

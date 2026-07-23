@@ -18,6 +18,11 @@ const SEED_CHIPS = [
     "How do I reach her?",
 ];
 
+// JS scrollTo ignores CSS reduced-motion overrides, so check the preference here
+function scrollBehavior(): ScrollBehavior {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+}
+
 function parseEnvelope(msg: Anthropic.MessageParam): ChatResponse | null {
     if (msg.role !== "assistant" || typeof msg.content === "string") return null;
     const raw = msg.content.filter((b) => b.type === "text").map((b) => b.text).join("");
@@ -115,7 +120,7 @@ export default function Home() {
             if (overflow > 60) setShowMoreChip(true);
             return;
         }
-        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+        el.scrollTo({ top: el.scrollHeight, behavior: scrollBehavior() });
     }, [messages, pText, pBlocks, statusLine, loading]);
 
     // rows that have already rendered must not replay their entrance animation —
@@ -127,7 +132,7 @@ export default function Home() {
     }, [messages]);
 
     function scrollToBottom() {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: scrollBehavior() });
         setShowMoreChip(false);
     }
 
@@ -294,13 +299,18 @@ export default function Home() {
                                 setShowMoreChip(false);
                             }
                         }}
+                        // role="log": new turns are announced politely; tabIndex lets
+                        // keyboard users focus and scroll the conversation
+                        role="log"
+                        aria-label="Conversation with Riley"
+                        tabIndex={0}
                         className="flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-5 py-6"
                     >
                         {messages.length === 0 && (
                             <div className="justify-end">
                                 <div className="flex flex-wrap justify-center gap-2">
                                     {SEED_CHIPS.map((chip) => (
-                                        <button key={chip} onClick={() => sendQuestion(chip)} className="cursor-pointer">
+                                        <button key={chip} type="button" onClick={() => sendQuestion(chip)} className="cursor-pointer">
                                             <InkFrame radius="10px 14px 12px 16px" background="var(--color-paper)" borderWidth={2} shadow={null}>
                                                 <span className="block px-3.5 py-1.5 text-[13px] font-medium">{chip}</span>
                                             </InkFrame>
@@ -328,7 +338,10 @@ export default function Home() {
                                             rotate={0.6}
                                             className="max-w-[78%]"
                                         >
-                                            <div className="px-4 py-3 text-[15px] leading-snug">{msg.content}</div>
+                                            <div className="px-4 py-3 text-[15px] leading-snug">
+                                                <span className="sr-only">You said: </span>
+                                                {msg.content}
+                                            </div>
                                             <div
                                                 aria-hidden
                                                 style={{
@@ -376,6 +389,7 @@ export default function Home() {
                                         className="max-w-[82%]"
                                     >
                                         <div className="px-4 py-3 text-[15px] leading-normal">
+                                            <span className="sr-only">Riley said: </span>
                                             {textBlocks.map((block, j) => (
                                                 <span key={j}>{block.text}</span>
                                             ))}
@@ -387,10 +401,12 @@ export default function Home() {
 
                         {/* in-flight response: streams in as a provisional envelope,
                             replaced by the canonical one when `done` arrives */}
+                        {/* aria-live="off": the char-by-char typewriter would spam screen
+                            readers; the canonical message announces once via the log on done */}
                         {loading && (pMeta || pText || pBlocks.length > 0) && (
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-3" aria-live="off">
                                 {pMeta?.intent && (
-                                    <span className="w-fit text-[11px] uppercase tracking-wider opacity-45">
+                                    <span className="w-fit text-[11px] uppercase tracking-wider opacity-65">
                                         {pMeta.intent}
                                     </span>
                                 )}
@@ -431,11 +447,12 @@ export default function Home() {
 
                         {/* thinking state: nothing has streamed yet */}
                         {loading && !pText && pBlocks.length === 0 && (
-                            <div className="flex items-center gap-1.5 text-[13.5px] italic opacity-60">
+                            <div role="status" className="flex items-center gap-1.5 text-[13.5px] italic opacity-60">
                                 {statusLine || "thinking"}
                                 {[0, 1, 2].map((i) => (
                                     <span
                                         key={i}
+                                        aria-hidden
                                         className="inline-block h-1 w-1 rounded-full bg-ink"
                                         style={{ animation: `dotPulse 1.2s ease-in-out ${i * 0.2}s infinite` }}
                                     />
@@ -443,11 +460,12 @@ export default function Home() {
                             </div>
                         )}
 
-                        {error && <div className="text-[13.5px] text-red-700">error: {error}</div>}
+                        {error && <div role="alert" className="text-[13.5px] text-red-700">error: {error}</div>}
                     </div>
 
                     {showMoreChip && (
                         <button
+                            type="button"
                             onClick={scrollToBottom}
                             className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 cursor-pointer"
                             style={{ animation: "fadeUp 0.3s ease both" }}
@@ -464,7 +482,9 @@ export default function Home() {
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Ask me anything…"
-                                className="font-accent italic w-full bg-transparent px-4 py-3 text-[15px] outline-none"
+                                aria-label="Ask Riley a question"
+                                enterKeyHint="send"
+                                className="font-accent italic w-full rounded-[14px] bg-transparent px-4 py-3 text-[15px] outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                             />
                         </InkFrame>
                         <button disabled={loading} className="cursor-pointer disabled:opacity-50">
@@ -475,7 +495,7 @@ export default function Home() {
                     </form>
                 </InkFrame>
 
-                <footer className="mt-3 shrink-0 text-center text-[12.5px] opacity-50">
+                <footer className="mt-3 shrink-0 text-center text-[12.5px] opacity-65">
                     made by Riley · 2026
                 </footer>
             </main>

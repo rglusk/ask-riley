@@ -40,7 +40,9 @@ export const RestaurantCard = z.object({
     name: z.string(),
     cuisine: z.string().optional(),
     neighborhood: z.string().optional(),
-    note: z.string().describe("Why Riley recommends it, verbatim from the knowledge base"),
+    note: z.string().optional().describe("Why Riley recommends it, verbatim from the knowledge base — omit when absent, NEVER invented"),
+    photo: z.string().optional().describe("Photo path from the knowledge base — never invented"),
+    url: z.string().optional().describe("Map/website link from the knowledge base only"),
 });
 
 export const LinkCard = z.object({

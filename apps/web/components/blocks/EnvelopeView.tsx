@@ -23,7 +23,7 @@ export function EnvelopeView({
     return (
         <div className="flex flex-col gap-3">
             {response.intent && (
-                <span className="w-fit text-[11px] uppercase tracking-wider opacity-45">
+                <span className="w-fit text-[11px] uppercase tracking-wider opacity-65">
                     {response.intent}
                 </span>
             )}
@@ -40,6 +40,7 @@ export function EnvelopeView({
                         className="max-w-[82%]"
                     >
                         <div className="px-4 py-3">
+                            <span className="sr-only">Riley said: </span>
                             {textBlocks.map((block, i) => (
                                 <BlockRenderer key={i} block={block} index={i} />
                             ))}
@@ -75,7 +76,7 @@ export function EnvelopeView({
             {response.suggestions && response.suggestions.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-2">
                     {response.suggestions.map((suggestion) => (
-                        <button key={suggestion} onClick={() => onSuggestion(suggestion)} className="cursor-pointer">
+                        <button key={suggestion} type="button" onClick={() => onSuggestion(suggestion)} className="cursor-pointer">
                             <InkFrame
                                 radius="10px 14px 12px 16px"
                                 background="var(--color-card)"
