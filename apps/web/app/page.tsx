@@ -14,9 +14,39 @@ import { InkHand } from "@/components/InkHand";
 
 const SEED_CHIPS = [
     "What movies does Riley love?",
+    "Where should I eat in SF?",
     "What has Riley built?",
     "How do I reach her?",
 ];
+
+// Auto-greeting shown on first load — a short text bubble + the intro card,
+// rendered client-side (instant, no API call). Mirrors profile in knowledge.json.
+const GREETING: ChatResponse = {
+    state: "answered",
+    intent: "Meet Riley",
+    blocks: [
+        {
+            type: "text",
+            markdown:
+                "Hi! Meet Riley :) ",
+        },
+        {
+            type: "intro_card",
+            name: "Riley Glusker",
+            headline: "Staff Frontend Engineer at Airbnb (Messaging)",
+            images: [
+                { src: "/photos/riley-garden-wide.jpg", alt: "Riley smiling in a lush garden with a palace behind her" },
+                { src: "/photos/riley-cafe.jpg", alt: "Riley smiling at an outdoor café with a glass of wine" },
+            ],
+            stats: [
+                { label: "Horror Movie Completionism", value: 99, viz: "line" },
+                { label: "Years in the Industry", value: 12, viz: "since", sinceDate: "2014-06-01" },
+                { label: "Unfinished Sweaters", value: 7, viz: "sweaters" },
+                { label: "Pub Quiz Titles", value: 1, viz: "trophy" },
+            ],
+        },
+    ],
+};
 
 // JS scrollTo ignores CSS reduced-motion overrides, so check the preference here
 function scrollBehavior(): ScrollBehavior {
@@ -59,6 +89,9 @@ export default function Home() {
         if (!payload) return;
         pendingDoneRef.current = null;
         suppressScrollRef.current = true; // no yank on the canonical swap
+        // swap rows replace content already on screen — an entrance animation
+        // here fades the fresh answer from blank, which reads as a white blink
+        animatedCountRef.current = payload.length;
         setMessages(payload);
         resetProvisional();
         setStatusLine("");
@@ -104,23 +137,56 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // keep the newest message in view while streaming — but on `done` (the
-    // canonical swap) never yank the reader; if the swap left content below
-    // the viewport, offer a "more below" chip instead
+    // scroll etiquette: a fresh question pins to the top of the frame so the
+    // answer streams into the empty space below it — never bottom-pinned, so
+    // content reads downward. When an answer outgrows the fold, the "more
+    // below" chip appears instead of the view chasing the stream.
     const scrollRef = useRef<HTMLDivElement>(null);
     const suppressScrollRef = useRef(false);
+    const anchorPendingRef = useRef(false);
+    const lastUserRef = useRef<HTMLDivElement>(null);
+    // spacer under the thread, sized at send time so the question can reach
+    // the top of the frame even while the answer below it is still empty
+    const spacerRef = useRef<HTMLDivElement>(null);
     const [showMoreChip, setShowMoreChip] = useState(false);
+
+    // scrollHeight minus the spacer: where the real content actually ends
+    function contentOverflow(el: HTMLDivElement) {
+        const spacer = spacerRef.current?.offsetHeight ?? 0;
+        return el.scrollHeight - spacer - el.scrollTop - el.clientHeight;
+    }
+    function maybeShowMoreChip(el: HTMLDivElement) {
+        // only once a conversation exists — the empty seed-chip state can
+        // overflow a short viewport, and a "more below" nudge there is noise
+        if (messages.length > 0 && contentOverflow(el) > 60) setShowMoreChip(true);
+    }
 
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
         if (suppressScrollRef.current) {
             suppressScrollRef.current = false;
-            const overflow = el.scrollHeight - el.scrollTop - el.clientHeight;
-            if (overflow > 60) setShowMoreChip(true);
+            maybeShowMoreChip(el);
             return;
         }
-        el.scrollTo({ top: el.scrollHeight, behavior: scrollBehavior() });
+        if (anchorPendingRef.current) {
+            anchorPendingRef.current = false;
+            const bubble = lastUserRef.current;
+            const spacer = spacerRef.current;
+            if (bubble && spacer) {
+                // offsetTop, not getBoundingClientRect — the row's fadeUp
+                // entrance is mid-flight here, and its translateY would measure
+                // the bubble ~10px low, leaving it flush against the frame top
+                const top = bubble.offsetTop - 4;
+                // spacer.offsetTop marks the true end of content — scrollHeight
+                // can't, since it's floored at clientHeight on short threads
+                const belowBubble = spacer.offsetTop - top;
+                spacer.style.height = `${Math.max(0, el.clientHeight - belowBubble)}px`;
+                el.scrollTo({ top, behavior: scrollBehavior() });
+            }
+            return;
+        }
+        maybeShowMoreChip(el);
     }, [messages, pText, pBlocks, statusLine, loading]);
 
     // rows that have already rendered must not replay their entrance animation —
@@ -132,7 +198,10 @@ export default function Home() {
     }, [messages]);
 
     function scrollToBottom() {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: scrollBehavior() });
+        const el = scrollRef.current;
+        if (!el) return;
+        const spacer = spacerRef.current?.offsetHeight ?? 0;
+        el.scrollTo({ top: el.scrollHeight - spacer - el.clientHeight, behavior: scrollBehavior() });
         setShowMoreChip(false);
     }
 
@@ -146,6 +215,7 @@ export default function Home() {
             { role: "user", content: question },
         ];
         setMessages(next);
+        anchorPendingRef.current = true; // pin this question to the top on render
         setInput("");
         setLoading(true);
         setError("");
@@ -280,8 +350,7 @@ export default function Home() {
                         )}
                     </div>
                     <p className="mx-auto mb-1 mt-1.5 max-w-lg text-[17px] leading-normal text-ink-soft">
-                        Ask me about the movies I love, my work, or how to reach me — I&apos;m a
-                        little bit of a chatbot about it.
+                        Ask me (aka my rileybot) about my work, my hobbies, or how to reach me!
                     </p>
                 </section>
 
@@ -295,7 +364,7 @@ export default function Home() {
                         ref={scrollRef}
                         onScroll={() => {
                             const el = scrollRef.current;
-                            if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 40) {
+                            if (el && contentOverflow(el) < 40) {
                                 setShowMoreChip(false);
                             }
                         }}
@@ -304,11 +373,14 @@ export default function Home() {
                         role="log"
                         aria-label="Conversation with Riley"
                         tabIndex={0}
-                        className="flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-5 py-6"
+                        className="relative flex min-h-0 flex-1 flex-col gap-9 overflow-y-auto px-5 py-6"
                     >
-                        {messages.length === 0 && (
-                            <div className="justify-end">
-                                <div className="flex flex-wrap justify-center gap-2">
+                        {messages.length === 0 && !loading && (
+                            <div className="flex flex-col gap-5" style={{ animation: "fadeUp 0.5s ease both" }}>
+                                {/* auto-greeting: text bubble + intro card */}
+                                <EnvelopeView response={GREETING} onSuggestion={sendQuestion} />
+                                {/* next-step chips */}
+                                <div className="flex flex-wrap gap-2.5">
                                     {SEED_CHIPS.map((chip) => (
                                         <button key={chip} type="button" onClick={() => sendQuestion(chip)} className="cursor-pointer">
                                             <InkFrame radius="10px 14px 12px 16px" background="var(--color-paper)" borderWidth={2} shadow={null}>
@@ -329,7 +401,12 @@ export default function Home() {
 
                             if (typeof msg.content === "string") {
                                 return (
-                                    <div key={i} className="flex justify-end" style={entrance}>
+                                    <div
+                                        key={i}
+                                        ref={i === messages.length - 1 ? lastUserRef : undefined}
+                                        className="flex justify-end"
+                                        style={entrance}
+                                    >
                                         <InkFrame
                                             radius="20px 16px 4px 18px"
                                             background="var(--color-bubble-user)"
@@ -367,7 +444,11 @@ export default function Home() {
                             if (envelope) {
                                 return (
                                     <div key={i} style={entrance}>
-                                        <EnvelopeView response={envelope} onSuggestion={sendQuestion} />
+                                        <EnvelopeView
+                                            response={envelope}
+                                            onSuggestion={sendQuestion}
+                                            showSuggestions={i === messages.length - 1}
+                                        />
                                     </div>
                                 );
                             }
@@ -404,7 +485,7 @@ export default function Home() {
                         {/* aria-live="off": the char-by-char typewriter would spam screen
                             readers; the canonical message announces once via the log on done */}
                         {loading && (pMeta || pText || pBlocks.length > 0) && (
-                            <div className="flex flex-col gap-3" aria-live="off">
+                            <div className="flex flex-col gap-4" aria-live="off">
                                 {pMeta?.intent && (
                                     <span className="w-fit text-[11px] uppercase tracking-wider opacity-65">
                                         {pMeta.intent}
@@ -434,7 +515,7 @@ export default function Home() {
                                     </div>
                                 )}
                                 {pBlocks.length > 0 && (
-                                    <div className="mt-2 flex flex-col gap-4">
+                                    <div className="mt-3 flex flex-col gap-5">
                                         {pBlocks.map((block, i) => (
                                             <div key={i} style={{ animation: "fadeUp 0.4s ease both" }}>
                                                 <BlockRenderer block={block} index={i} />
@@ -461,6 +542,9 @@ export default function Home() {
                         )}
 
                         {error && <div role="alert" className="text-[13.5px] text-red-700">error: {error}</div>}
+
+                        {/* height set imperatively by the anchor effect on send */}
+                        <div ref={spacerRef} aria-hidden className="shrink-0" />
                     </div>
 
                     {showMoreChip && (

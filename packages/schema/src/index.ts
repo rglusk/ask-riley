@@ -63,8 +63,18 @@ export const IntroCard = z.object({
     })).min(1).max(6).describe("Carousel of photos of Riley"),
     stats: z.array(z.object({
         label: z.string().describe("Playful stat name from the knowledge base, e.g. 'Pub Quiz ATK'"),
-        value: z.number().int().min(0).max(999),
+        value: z.number().min(0).max(999),
+        viz: z.enum(["meter", "line", "since", "sweaters", "trophy"]).optional()
+            .describe("How to draw the stat; defaults to a meter bar"),
+        sinceDate: z.string().optional().describe("ISO date for viz 'since' — value counts up live from here"),
     })).max(6).optional().describe("Trading-card style stats, verbatim from the knowledge base"),
+});
+
+export const ArchitectureCard = z.object({
+    type: z.literal("architecture_card"),
+    // full-width diagram of how this very bot works. The renderer holds the real
+    // architecture — the model only chooses to show it, never authors it.
+    caption: z.string().optional().describe("Optional one-line framing above the diagram"),
 });
 
 export const ContactCard = z.object({
@@ -82,6 +92,7 @@ export const Block = z.discriminatedUnion("type", [
     RestaurantCard,
     LinkCard,
     IntroCard,
+    ArchitectureCard,
     ContactCard,
 ]);
 
@@ -120,6 +131,7 @@ export type MovieCard = z.infer<typeof MovieCard>;
 export type RestaurantCard = z.infer<typeof RestaurantCard>;
 export type LinkCard = z.infer<typeof LinkCard>;
 export type IntroCard = z.infer<typeof IntroCard>;
+export type ArchitectureCard = z.infer<typeof ArchitectureCard>;
 export type ContactCard = z.infer<typeof ContactCard>;
 export type Block = z.infer<typeof Block>;
 export type ChatResponse = z.infer<typeof ChatResponse>;

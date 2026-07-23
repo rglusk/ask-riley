@@ -3,7 +3,41 @@
         "name": "Riley Glusker",
         "pronouns": "she/her",
         "headline": "Staff Frontend Engineer at Airbnb (Messaging)",
-        "summary": "Staff frontend engineer specializing in messaging products, server-driven UI platforms, streaming interfaces, and AI trust patterns. At Airbnb since 2019; previously Goldman Sachs."
+        "summary": "Staff frontend engineer specializing in messaging products, server-driven UI platforms, streaming interfaces, and AI trust patterns. At Airbnb since 2019; previously Goldman Sachs.",
+        "tagline": "I build streaming interfaces and server-driven UI at Airbnb — and I watch pretty much every horror movie that comes out.",
+        "photos": [
+            {
+                "src": "/photos/riley-garden-wide.jpg",
+                "alt": "Riley smiling in a lush garden with a palace and pink flowers behind her"
+            },
+            {
+                "src": "/photos/riley-cafe.jpg",
+                "alt": "Riley smiling at an outdoor café with a glass of wine"
+            }
+        ],
+        "stats": [
+            {
+                "label": "Horror Movie Completionism",
+                "value": 99,
+                "viz": "line"
+            },
+            {
+                "label": "Years in the Industry",
+                "value": 12,
+                "viz": "since",
+                "sinceDate": "2014-06-01"
+            },
+            {
+                "label": "Unfinished Sweaters",
+                "value": 7,
+                "viz": "sweaters"
+            },
+            {
+                "label": "Pub Quiz Titles",
+                "value": 1,
+                "viz": "trophy"
+            }
+        ]
     },
     "contact": {
         "name": "Riley Glusker",

@@ -13,15 +13,17 @@ const stateBackground: Record<ChatResponse["state"], string> = {
 export function EnvelopeView({
     response,
     onSuggestion,
+    showSuggestions = true,
 }: {
     response: ChatResponse;
     onSuggestion: (question: string) => void;
+    showSuggestions?: boolean;
 }) {
     const textBlocks = response.blocks.filter((b) => b.type === "text");
     const cardBlocks = response.blocks.filter((b) => b.type !== "text");
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
             {response.intent && (
                 <span className="w-fit text-[11px] uppercase tracking-wider opacity-65">
                     {response.intent}
@@ -66,15 +68,17 @@ export function EnvelopeView({
 
             {/* cards stack below the bubble */}
             {cardBlocks.length > 0 && (
-                <div className="mt-2 flex flex-col gap-4">
+                <div className="mt-3 flex flex-col gap-5">
                     {cardBlocks.map((block, i) => (
                         <BlockRenderer key={i} block={block} index={i} />
                     ))}
                 </div>
             )}
 
-            {response.suggestions && response.suggestions.length > 0 && (
-                <div className="mt-1 flex flex-wrap gap-2">
+            {/* pills only survive while this is the newest turn: once one is
+                clicked (or anything is sent), the round is over and they go */}
+            {showSuggestions && response.suggestions && response.suggestions.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2.5">
                     {response.suggestions.map((suggestion) => (
                         <button key={suggestion} type="button" onClick={() => onSuggestion(suggestion)} className="cursor-pointer">
                             <InkFrame

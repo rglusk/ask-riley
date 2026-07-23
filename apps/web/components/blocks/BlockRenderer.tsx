@@ -5,6 +5,8 @@ import { ProjectCardView } from "./ProjectCardView";
 import { ContactCardView } from "./ContactCardView";
 import { RestaurantCardView } from "./RestaurantCardView";
 import { LinkCardView } from "./LinkCardView";
+import { IntroCardView } from "./IntroCardView";
+import { ArchitectureCardView } from "./ArchitectureCardView";
 
 // pastel rotation for card runs — index comes from the block's position
 const TONES = [
@@ -49,6 +51,14 @@ export function BlockRenderer({ block, index = 0 }: { block: Block; index?: numb
         case "link_card": {
             const { type, ...props } = block;
             return <LinkCardView {...props} rotate={index % 2 === 0 ? -1 : 0.9} />;
+        }
+        case "intro_card": {
+            const { type, ...props } = block;
+            return <IntroCardView {...props} />;
+        }
+        case "architecture_card": {
+            const { type, ...props } = block;
+            return <ArchitectureCardView {...props} />;
         }
         case "contact_card": {
             const { type, ...props } = block;
