@@ -364,11 +364,23 @@ export default function Home() {
                             if (msg.content.some((block) => block.type === "tool_use")) return null;
                             const textBlocks = msg.content.filter((block) => block.type === "text");
                             if (textBlocks.length === 0) return null;
+                            // degraded/legacy prose still gets a proper speech bubble
                             return (
-                                <div key={i} className="text-[15px] opacity-80">
-                                    {textBlocks.map((block, j) => (
-                                        <span key={j}>{block.text}</span>
-                                    ))}
+                                <div key={i} className="flex" style={entrance}>
+                                    <InkFrame
+                                        radius="16px 20px 18px 4px"
+                                        background="var(--color-card)"
+                                        borderWidth={2}
+                                        shadow={null}
+                                        rotate={-0.6}
+                                        className="max-w-[82%]"
+                                    >
+                                        <div className="px-4 py-3 text-[15px] leading-normal">
+                                            {textBlocks.map((block, j) => (
+                                                <span key={j}>{block.text}</span>
+                                            ))}
+                                        </div>
+                                    </InkFrame>
                                 </div>
                             );
                         })}

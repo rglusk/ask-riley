@@ -199,6 +199,35 @@
                 "imdbUrl": "https://www.imdb.com/title/tt27802490/",
                 "posterUrl": "/posters/exhuma.jpg",
                 "take": null
+            },
+            {
+                "title": "The Cabin in the Woods",
+                "year": 2011,
+                "director": "Drew Goddard",
+                "summary": "Five teens visit a remote cabin and explore its cellar, finding strange items. When Dana reads from a book there, she unleashes zombie killers. But the situation is more complex than it appears.",
+                "themes": [
+                    "Dark Comedy",
+                    "Conspiracy Horror",
+                    "Slasher",
+                    "Monster Horror"
+                ],
+                "imdbUrl": "https://www.imdb.com/title/tt1259521/",
+                "posterUrl": "/posters/cabin-in-the-woods.jpg",
+                "take": null
+            },
+            {
+                "title": "Ready or Not",
+                "year": 2019,
+                "director": "Matt Bettinelli-Olpin & Tyler Gillett",
+                "summary": "A bride's wedding night takes a sinister turn when her eccentric new in-laws force her to take part in a terrifying game.",
+                "themes": [
+                    "Dark Comedy",
+                    "Horror",
+                    "Splatter Horror"
+                ],
+                "imdbUrl": "https://www.imdb.com/title/tt7798634/",
+                "posterUrl": "/posters/ready-or-not.jpg",
+                "take": null
             }
         ]
     },
