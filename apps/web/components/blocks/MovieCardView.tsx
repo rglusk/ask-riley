@@ -49,7 +49,7 @@ export function MovieCardView({
             rotate={rotate}
             className="w-full max-w-85"
         >
-            <div className="flex flex-col gap-2.5 p-3.5">
+            <div className="flex flex-row gap-2.5 p-3.5">
                 {poster && (
                     <div
                         className="w-25 max-w-full overflow-hidden rounded-lg border-2 border-ink"
@@ -58,44 +58,45 @@ export function MovieCardView({
                         <img src={poster} alt={`${title} poster`} className="h-full w-full object-cover" />
                     </div>
                 )}
+                <div className="flex flex-1 flex-col gap-1.5">
+                    <div>
+                        <h3 className="font-accent italic text-xl leading-tight">{title}</h3>
+                        {(year || director) && (
+                            <p className="mt-0.5 text-xs opacity-70">
+                                {[year, director && `dir. ${director}`].filter(Boolean).join(" · ")}
+                            </p>
+                        )}
+                    </div>
 
-                <div>
-                    <h3 className="font-accent italic text-xl leading-tight">{title}</h3>
-                    {(year || director) && (
-                        <p className="mt-0.5 text-xs opacity-70">
-                            {[year, director && `dir. ${director}`].filter(Boolean).join(" · ")}
-                        </p>
+                    {vibe && (
+                        <span className="w-fit text-[11px] font-semibold uppercase tracking-wide opacity-60">
+                            {vibe}
+                        </span>
+                    )}
+
+                    {take && <p className="m-0 text-[13.5px] leading-normal opacity-85">“{take}”</p>}
+
+                    {url && (
+                        <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => (pending.current = true)}
+                            className="mt-auto self-start pt-2"
+                        >
+                            <InkFrame
+                                radius="12px 8px 10px 6px"
+                                background="var(--color-card)"
+                                borderWidth={2}
+                                shadow={null}
+                            >
+                                <span className="block px-3 py-1.5 text-[13px] font-semibold">
+                                    View on IMDb ↗
+                                </span>
+                            </InkFrame>
+                        </a>
                     )}
                 </div>
-
-                {vibe && (
-                    <span className="w-fit text-[11px] font-semibold uppercase tracking-wide opacity-60">
-                        {vibe}
-                    </span>
-                )}
-
-                {take && <p className="m-0 text-[13.5px] leading-normal opacity-85">“{take}”</p>}
-
-                {url && (
-                    <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => (pending.current = true)}
-                        className="self-start"
-                    >
-                        <InkFrame
-                            radius="12px 8px 10px 6px"
-                            background="var(--color-card)"
-                            borderWidth={2}
-                            shadow={null}
-                        >
-                            <span className="block px-3 py-1.5 text-[13px] font-semibold">
-                                View on IMDb ↗
-                            </span>
-                        </InkFrame>
-                    </a>
-                )}
             </div>
 
             {dripped && (

@@ -2,7 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createMcpServer } from "@ask-riley/mcp";
-import { ChatResponse } from "@ask-riley/schema";
+import { Block, ChatResponse } from "@ask-riley/schema";
+import { parse as parsePartial, Allow } from "partial-json";
 import { systemPrompt } from "./system-prompt";
 
 const anthropic = new Anthropic();
@@ -44,7 +45,9 @@ function getAgentContext() {
 // events the loop emits — consumed by the route (as SSE) and by the eval
 // harness (recorded in an array). The loop never knows which.
 export type ChatEvent =
-    | { type: "delta"; text: string }
+    | { type: "meta"; state: ChatResponse["state"]; intent: string | null }  // envelope head, parsed early
+    | { type: "text"; delta: string }        // prose characters from text blocks (never JSON syntax)
+    | { type: "block"; block: Block }        // a completed non-text block, ready to render
     | { type: "status"; tool: string; input: unknown }
     | { type: "done"; response: ChatResponse; messages: Anthropic.MessageParam[] }
     | { type: "error"; message: string };
@@ -76,9 +79,64 @@ export async function runAgentLoop(
             messages,
         });
 
+        // incremental envelope streaming: parse the model's JSON as it arrives and
+        // translate it into semantic events — meta early, prose as text deltas,
+        // completed cards as block events. The client never sees JSON syntax.
+        let jsonBuffer = "";
+        let sentMeta = false;
+        let sentTextChars = 0;
+        const sentBlockIdx = new Set<number>();
+
+        const concatText = (env: { blocks?: unknown[] }): string =>
+            (Array.isArray(env.blocks) ? env.blocks : [])
+                .filter((b): b is { type: "text"; markdown?: string } =>
+                    typeof b === "object" && b !== null && (b as { type?: unknown }).type === "text")
+                .map((b) => b.markdown ?? "")
+                .join("\n\n");
+
+        const streamEnvelope = (chunk: string) => {
+            jsonBuffer += chunk;
+            if (!jsonBuffer.trimStart().startsWith("{")) return; // not an envelope (prose turn)
+
+            let partial: unknown;
+            try {
+                partial = parsePartial(jsonBuffer, Allow.ALL);
+            } catch {
+                return; // mid-token; wait for more
+            }
+            const env = partial as { state?: unknown; intent?: unknown; blocks?: unknown[] };
+
+            if (!sentMeta && typeof env.state === "string") {
+                sentMeta = true;
+                send({
+                    type: "meta",
+                    state: env.state as ChatResponse["state"],
+                    intent: typeof env.intent === "string" ? env.intent : null,
+                });
+            }
+
+            // every block except the last is fully parsed; emit completed card blocks
+            const blocks = Array.isArray(env.blocks) ? env.blocks : [];
+            for (let i = 0; i < blocks.length - 1; i++) {
+                if (sentBlockIdx.has(i)) continue;
+                sentBlockIdx.add(i);
+                const parsed = Block.safeParse(blocks[i]);
+                if (parsed.success && parsed.data.type !== "text") {
+                    send({ type: "block", block: parsed.data });
+                }
+            }
+
+            // text blocks stream as they grow (their markdown only ever appends)
+            const text = concatText(env);
+            if (text.length > sentTextChars) {
+                send({ type: "text", delta: text.slice(sentTextChars) });
+                sentTextChars = text.length;
+            }
+        };
+
         for await (const event of modelStream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-                send({ type: "delta", text: event.delta.text });
+                streamEnvelope(event.delta.text);
             }
         }
 
@@ -106,6 +164,21 @@ export async function runAgentLoop(
             } catch {
                 response = fallbackEnvelope(raw);   // wasn't even JSON
             }
+
+            // finalize streaming against the validated envelope: flush any text
+            // tail and any blocks the incremental parser hadn't completed
+            const finalText = response.blocks
+                .filter((b) => b.type === "text")
+                .map((b) => b.markdown)
+                .join("\n\n");
+            if (finalText.length > sentTextChars) {
+                send({ type: "text", delta: finalText.slice(sentTextChars) });
+            }
+            response.blocks.forEach((block, i) => {
+                if (block.type !== "text" && !sentBlockIdx.has(i)) {
+                    send({ type: "block", block });
+                }
+            });
 
             send({ type: "done", response, messages });
             return;
