@@ -109,7 +109,7 @@
             "id": "streaming-ux",
             "name": "Streaming response UX over WebSockets",
             "role": "Designer and implementer",
-            "description": "Built a streaming-feel response UI over WebSockets (no SSE available): token chunks are queued per socket event and drained on a timer, progressively rendering text and markdown tables for a smooth streaming experience from bursty transport.",
+            "description": "Riley built a WebSocket-based version of streaming: a streaming-feel response UI where token chunks are queued per socket event and drained on a timer, progressively rendering text and markdown tables for a smooth experience from bursty transport.",
             "highlights": [
                 "Chunk-queue pattern smooths bursty WebSocket events into fluid rendering",
                 "Progressive markdown rendering mid-stream, including tables"
