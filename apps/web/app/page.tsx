@@ -227,7 +227,9 @@ export default function Home() {
                 body: JSON.stringify({ messages: next }),
             });
             if (!res.ok || !res.body) {
-                throw new Error(`request failed (${res.status})`);
+                // the rate limiter (and friends) send a human-readable body
+                const detail = res.ok ? "" : await res.text().catch(() => "");
+                throw new Error(detail || `request failed (${res.status})`);
             }
 
             const reader = res.body.getReader();
