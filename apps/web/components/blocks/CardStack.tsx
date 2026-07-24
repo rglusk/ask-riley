@@ -47,8 +47,12 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
     const peeks = Math.min(order.length - 1, MAX_PEEKS);
 
     return (
-        // w-fit: shrink-wrap to the card so the flip button can hug its edge
-        <div className="relative w-fit">
+        // w-fit shrink-wraps to the card so the flip button can hug its edge.
+        // grid: every card shares one cell, so the TALLEST card fixes the
+        // container height — flipping between different-height cards never
+        // shifts the dots, the button, or anything below the stack. Cards
+        // anchor to the shared bottom edge, so the peek fan stays even too.
+        <div className="relative grid w-fit">
             {order.map((blockIdx, depth) => {
                 const isTop = depth === 0;
                 // while the top card flies out, everyone below rises one slot
@@ -58,10 +62,8 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
                         key={blockIdx}
                         aria-hidden={!isTop || undefined}
                         style={{
-                            position: isTop ? "relative" : "absolute",
-                            top: isTop ? undefined : 0,
-                            left: 0,
-                            right: 0,
+                            gridArea: "1 / 1",
+                            alignSelf: "end",
                             zIndex: order.length - depth,
                             // flip: the top card lifts up off the pile, then (after the
                             // reorder drops its zIndex) slides back down underneath it
