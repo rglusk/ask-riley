@@ -21,26 +21,28 @@ export function groupCardBlocks(blocks: Block[]): { start: number; blocks: Block
 const PEEK = 18; // px of each buried card left visible below the one above — enough to read every card in the fan
 const MAX_PEEKS = 5; // deeper cards align with the fifth so a huge pile can't grow a giant tail
 const SWAP_MS = 320;
-const LIFT = 64; // px the top card rises before tucking under the stack
+const LIFT = "58%"; // of the card's own height — it visibly clears the pile before tucking under
 
 export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: number }) {
     // order[0] is the top card; advancing tucks it to the bottom
     const [order, setOrder] = useState(() => blocks.map((_, i) => i));
-    const [leaving, setLeaving] = useState(false);
+    // "next": top card lifts out, then tucks under. "prev": the exact reverse —
+    // the bottom card rises from behind the pile, then settles on top.
+    const [phase, setPhase] = useState<null | "next" | "prev">(null);
 
     // cards can keep arriving while a response streams — slide them under
     if (order.length < blocks.length) {
         setOrder([...order, ...blocks.map((_, i) => i).slice(order.length)]);
     }
 
-    function next() {
-        if (leaving || order.length < 2) return;
-        setLeaving(true);
-        // the fly-out runs first; the reorder then lets the old top slide back
-        // in underneath the pile (that slide IS the "swap cards" animation)
+    function flip(dir: "next" | "prev") {
+        if (phase || order.length < 2) return;
+        setPhase(dir);
+        // the lift runs first; the reorder swaps zIndex so the lifted card
+        // slides back down on the other side of the pile
         setTimeout(() => {
-            setOrder((o) => [...o.slice(1), o[0]]);
-            setLeaving(false);
+            setOrder((o) => (dir === "next" ? [...o.slice(1), o[0]] : [o[o.length - 1], ...o.slice(0, -1)]));
+            setPhase(null);
         }, SWAP_MS);
     }
 
@@ -55,8 +57,15 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
         <div className="relative grid w-fit">
             {order.map((blockIdx, depth) => {
                 const isTop = depth === 0;
-                // while the top card flies out, everyone below rises one slot
-                const slot = Math.min(leaving && !isTop ? depth - 1 : depth, MAX_PEEKS);
+                const isBottom = depth === order.length - 1;
+                // the lifted card: next lifts the top out, prev lifts the bottom
+                // out from behind (its low zIndex keeps it behind the pile on the
+                // way up; the reorder then flips which side it comes down on)
+                const lifted = (phase === "next" && isTop) || (phase === "prev" && isBottom);
+                // everyone else pre-shifts one slot toward their post-reorder spot,
+                // so the reorder itself lands with no jump
+                const shifted = phase === "next" ? depth - 1 : phase === "prev" ? depth + 1 : depth;
+                const slot = Math.min(Math.max(shifted, 0), MAX_PEEKS);
                 return (
                     <div
                         key={blockIdx}
@@ -65,12 +74,9 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
                             gridArea: "1 / 1",
                             alignSelf: "end",
                             zIndex: order.length - depth,
-                            // flip: the top card lifts up off the pile, then (after the
-                            // reorder drops its zIndex) slides back down underneath it
-                            transform:
-                                isTop && leaving
-                                    ? `translateY(-${LIFT}px) rotate(-2.5deg)`
-                                    : `translateY(${slot * PEEK}px) scale(${1 - slot * 0.012}) rotate(${slot === 0 ? 0 : slot % 2 ? -0.7 : 0.5}deg)`,
+                            transform: lifted
+                                ? `translateY(-${LIFT}) rotate(${phase === "next" ? -2.5 : 2.5}deg)`
+                                : `translateY(${slot * PEEK}px) scale(${1 - slot * 0.012}) rotate(${slot === 0 ? 0 : slot % 2 ? -0.7 : 0.5}deg)`,
                             transformOrigin: "50% 100%",
                             transition: `transform ${SWAP_MS}ms ease, opacity ${SWAP_MS}ms ease`,
                             pointerEvents: isTop ? undefined : "none",
@@ -83,30 +89,51 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
 
             {order.length > 1 && (
                 <>
-                    <button
-                        type="button"
-                        onClick={next}
-                        aria-label={`Flip to next card (${order.length} in this stack)`}
-                        className="absolute top-1/2 -translate-y-1/2 cursor-pointer"
-                        style={{ left: "calc(100% + 16px)", zIndex: order.length + 1 }}
+                    {/* prev/next — the universally recognizable carousel controls */}
+                    <div
+                        className="absolute top-1/2 flex -translate-y-1/2 flex-col gap-2"
+                        style={{
+                            left: "calc(100% + 16px)",
+                            zIndex: order.length + 1,
+                            // mounts mid-stream when the second card lands — ease it in
+                            animation: "fadeUp 0.35s ease both",
+                        }}
                     >
-                        <InkFrame radius="999px" background="var(--color-paper)" borderWidth={2} shadow="2px 2px 0">
-                            <span className="flex h-9 w-9 items-center justify-center">
-                                {/* hand-drawn flip symbol tracing the card's motion:
-                                    up, over to the right, arcing back down */}
-                                <svg viewBox="0 0 24 24" width={18} height={18} aria-hidden style={{ filter: "url(#inkRough)" }}>
-                                    <path
-                                        d="M5.5 17.5 C5.5 9.5, 8.5 5, 12 5 C15.7 5, 18.7 8.7, 18.7 15 M18.7 15 L16 12.4 M18.7 15 L21.4 12.4"
-                                        stroke="var(--color-ink)"
-                                        strokeWidth="2.4"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </span>
-                        </InkFrame>
-                    </button>
+                        {(["prev", "next"] as const).map((dir) => (
+                            <button
+                                key={dir}
+                                type="button"
+                                onClick={() => flip(dir)}
+                                aria-label={`${dir === "prev" ? "Previous" : "Next"} card (${order.length} in this stack)`}
+                                className="cursor-pointer"
+                            >
+                                <InkFrame radius="999px" background="var(--color-paper)" borderWidth={2} shadow="2px 2px 0">
+                                    <span className="flex h-9 w-9 items-center justify-center">
+                                        {/* hand-drawn left/right arrow */}
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            width={17}
+                                            height={17}
+                                            aria-hidden
+                                            style={{
+                                                filter: "url(#inkRough)",
+                                                transform: dir === "prev" ? "scaleX(-1)" : undefined,
+                                            }}
+                                        >
+                                            <path
+                                                d="M4.5 12 H18 M13 6.5 C15 9, 16.5 10.5, 19.5 12 C16.5 13.5, 15 15, 13 17.5"
+                                                stroke="var(--color-ink)"
+                                                strokeWidth="2.6"
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </span>
+                                </InkFrame>
+                            </button>
+                        ))}
+                    </div>
 
                     {/* carousel dots: hollow, with the current card's filled */}
                     <div
@@ -121,6 +148,9 @@ export function CardStack({ blocks, baseIndex }: { blocks: Block[]; baseIndex: n
                                 style={{
                                     background: i === order[0] ? "var(--color-ink)" : "transparent",
                                     transition: "background 0.2s ease",
+                                    // each dot eases in as its card streams into the pile;
+                                    // existing dots keep their identity and don't replay
+                                    animation: "fadeUp 0.3s ease both",
                                 }}
                             />
                         ))}
