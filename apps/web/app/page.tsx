@@ -5,6 +5,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { ChatResponse, type Block } from "@ask-riley/schema";
 import { EnvelopeView } from "@/components/blocks/EnvelopeView";
 import { BlockRenderer } from "@/components/blocks/BlockRenderer";
+import { CardStack, groupCardBlocks } from "@/components/blocks/CardStack";
 import type { ChatEvent } from "@/lib/agent";
 import ReactMarkdown from "react-markdown";
 import { InkFrame } from "@/components/InkFrame";
@@ -18,35 +19,6 @@ const SEED_CHIPS = [
     "What has Riley built?",
     "How do I reach her?",
 ];
-
-// Auto-greeting shown on first load — a short text bubble + the intro card,
-// rendered client-side (instant, no API call). Mirrors profile in knowledge.json.
-const GREETING: ChatResponse = {
-    state: "answered",
-    intent: "Meet Riley",
-    blocks: [
-        {
-            type: "text",
-            markdown:
-                "Hi! Meet Riley :) ",
-        },
-        {
-            type: "intro_card",
-            name: "Riley Glusker",
-            headline: "Staff Frontend Engineer at Airbnb (Messaging)",
-            images: [
-                { src: "/photos/riley-garden-wide.jpg", alt: "Riley smiling in a lush garden with a palace behind her" },
-                { src: "/photos/riley-cafe.jpg", alt: "Riley smiling at an outdoor café with a glass of wine" },
-            ],
-            stats: [
-                { label: "Horror Movie Completionism", value: 99, viz: "line" },
-                { label: "Years in the Industry", value: 12, viz: "since", sinceDate: "2014-06-01" },
-                { label: "Unfinished Sweaters", value: 7, viz: "sweaters" },
-                { label: "Pub Quiz Titles", value: 1, viz: "trophy" },
-            ],
-        },
-    ],
-};
 
 // JS scrollTo ignores CSS reduced-motion overrides, so check the preference here
 function scrollBehavior(): ScrollBehavior {
@@ -182,8 +154,10 @@ export default function Home() {
             if (bubble && spacer) {
                 // offsetTop, not getBoundingClientRect — the row's fadeUp
                 // entrance is mid-flight here, and its translateY would measure
-                // the bubble ~10px low, leaving it flush against the frame top
-                const top = bubble.offsetTop - 4;
+                // the bubble ~10px low, leaving it flush against the frame top.
+                // Leave ~5% of the viewport as breathing room above the question
+                // rather than pinning it hard to the very top.
+                const top = bubble.offsetTop - el.clientHeight * 0.05;
                 // spacer.offsetTop marks the true end of content — scrollHeight
                 // can't, since it's floored at clientHeight on short threads
                 const belowBubble = spacer.offsetTop - top;
@@ -384,19 +358,23 @@ export default function Home() {
                         className="relative flex min-h-0 flex-1 flex-col gap-9 overflow-y-auto px-5 py-6"
                     >
                         {messages.length === 0 && !loading && (
-                            <div className="flex flex-col gap-5" style={{ animation: "fadeUp 0.5s ease both" }}>
-                                {/* auto-greeting: text bubble + intro card */}
-                                <EnvelopeView response={GREETING} onSuggestion={sendQuestion} />
-                                {/* next-step chips */}
-                                <div className="flex flex-wrap gap-2.5">
-                                    {SEED_CHIPS.map((chip) => (
-                                        <button key={chip} type="button" onClick={() => sendQuestion(chip)} className="cursor-pointer">
-                                            <InkFrame radius="10px 14px 12px 16px" background="var(--color-paper)" borderWidth={2} shadow={null}>
-                                                <span className="block px-3.5 py-1.5 text-[13px] font-medium">{chip}</span>
-                                            </InkFrame>
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className="flex flex-wrap gap-2.5" style={{ animation: "fadeUp 0.5s ease both" }}>
+                                {/* the starred chip is the suggested starting point */}
+                                <button type="button" onClick={() => sendQuestion("Intro to Riley")} className="cursor-pointer">
+                                    <InkFrame radius="10px 14px 12px 16px" background="var(--color-pastel-butter)" borderWidth={2} shadow={null}>
+                                        <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-[13px] font-medium">
+                                            <InkStar size={13} filled />
+                                            Intro to Riley
+                                        </span>
+                                    </InkFrame>
+                                </button>
+                                {SEED_CHIPS.map((chip) => (
+                                    <button key={chip} type="button" onClick={() => sendQuestion(chip)} className="cursor-pointer">
+                                        <InkFrame radius="10px 14px 12px 16px" background="var(--color-paper)" borderWidth={2} shadow={null}>
+                                            <span className="block px-3.5 py-1.5 text-[13px] font-medium">{chip}</span>
+                                        </InkFrame>
+                                    </button>
+                                ))}
                             </div>
                         )}
 
@@ -524,9 +502,16 @@ export default function Home() {
                                 )}
                                 {pBlocks.length > 0 && (
                                     <div className="mt-3 flex flex-col gap-5">
-                                        {pBlocks.map((block, i) => (
-                                            <div key={i} style={{ animation: "fadeUp 0.4s ease both" }}>
-                                                <BlockRenderer block={block} index={i} />
+                                        {/* same grouping as the canonical envelope, so streamed
+                                            cards pile into their stack live instead of snapping
+                                            into one on the done swap */}
+                                        {groupCardBlocks(pBlocks).map((group) => (
+                                            <div key={group.start} style={{ animation: "fadeUp 0.4s ease both" }}>
+                                                {group.blocks.length > 1 ? (
+                                                    <CardStack blocks={group.blocks} baseIndex={group.start} />
+                                                ) : (
+                                                    <BlockRenderer block={group.blocks[0]} index={group.start} />
+                                                )}
                                             </div>
                                         ))}
                                     </div>

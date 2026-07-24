@@ -1,5 +1,6 @@
 import type { ChatResponse } from "@ask-riley/schema";
 import { BlockRenderer } from "./BlockRenderer";
+import { CardStack, groupCardBlocks } from "./CardStack";
 import { InkFrame } from "../InkFrame";
 
 // trust states tint the assistant bubble itself: honest states look different,
@@ -66,12 +67,17 @@ export function EnvelopeView({
                 </div>
             )}
 
-            {/* cards stack below the bubble */}
+            {/* cards below the bubble: same-type runs pile into a CardStack,
+                mixed types sit separately in the vertical flow */}
             {cardBlocks.length > 0 && (
                 <div className="mt-3 flex flex-col gap-5">
-                    {cardBlocks.map((block, i) => (
-                        <BlockRenderer key={i} block={block} index={i} />
-                    ))}
+                    {groupCardBlocks(cardBlocks).map((group) =>
+                        group.blocks.length > 1 ? (
+                            <CardStack key={group.start} blocks={group.blocks} baseIndex={group.start} />
+                        ) : (
+                            <BlockRenderer key={group.start} block={group.blocks[0]} index={group.start} />
+                        ),
+                    )}
                 </div>
             )}
 
