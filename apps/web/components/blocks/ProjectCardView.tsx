@@ -1,6 +1,29 @@
 import type { ProjectCard } from "@ask-riley/schema";
 import { InkFrame } from "../InkFrame";
 
+// hand-drawn pencil bullet, in the ink language (replaces the ✏️ emoji)
+function InkPencil() {
+    return (
+        <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            width={13}
+            height={13}
+            className="mt-[3px] shrink-0"
+            style={{ filter: "url(#inkRough)" }}
+        >
+            <path
+                d="M4.5 19.5 L6.5 13.8 L16.2 4.1 C17.3 3 19.1 3 20.2 4.1 C21.3 5.2 21.3 7 20.2 8.1 L10.5 17.8 Z"
+                fill="none"
+                stroke="var(--color-ink)"
+                strokeWidth="2"
+                strokeLinejoin="round"
+            />
+            <path d="M6.5 13.8 L10.5 17.8" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 export function ProjectCardView({
     title,
     role,
@@ -20,8 +43,8 @@ export function ProjectCardView({
                 {highlights.length > 0 && (
                     <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] opacity-85">
                         {highlights.map((h) => (
-                            <li key={h}>
-                                <span aria-hidden>✏️ </span>
+                            <li key={h} className="flex items-start gap-1.5">
+                                <InkPencil />
                                 {h}
                             </li>
                         ))}

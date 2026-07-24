@@ -25,10 +25,11 @@ export function ArchitectureCardView({ caption }: Omit<ArchitectureCard, "type">
                     {caption ?? "How this bot works — a tiny server-driven UI system, built by Riley:"}
                 </p>
 
-                {/* the flow: nodes left→right on desktop, stacked on mobile */}
-                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                {/* the flow: nodes left→right on desktop (centered as a group),
+                    stacked on mobile */}
+                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center">
                     {NODES.map((node, i) => (
-                        <div key={node.title} className="flex items-center gap-2 sm:flex-1 sm:flex-col sm:gap-2">
+                        <div key={node.title} className="flex items-center gap-2 sm:flex-col sm:gap-2">
                             <InkFrame
                                 radius="11px 15px 10px 14px"
                                 background={node.tone}
@@ -47,10 +48,11 @@ export function ArchitectureCardView({ caption }: Omit<ArchitectureCard, "type">
                     ))}
                 </div>
 
-                {/* return path */}
-                <div className="flex items-center gap-2 text-[11.5px] italic opacity-70">
+                {/* return path: the arrow drops out of knowledge.json (the last
+                    node, right end) and points back at the streams-back text */}
+                <div className="flex items-center justify-end gap-2 text-[11.5px] italic opacity-70 sm:pr-8">
+                    <span className="text-right">…and the answer streams back as hand-drawn cards, composed by Claude.</span>
                     <ReturnArrow />
-                    <span>…and the answer streams back as hand-drawn cards, composed by Claude.</span>
                 </div>
             </div>
         </InkFrame>
@@ -72,11 +74,30 @@ function Connector() {
     );
 }
 
+// hooks down out of knowledge.json, then curls left to point at the text
 function ReturnArrow() {
     return (
-        <svg aria-hidden viewBox="0 0 40 24" style={{ width: 26, height: 16, filter: "url(#inkRough)" }}>
-            <path d="M37 12 C26 15 16 9 7 12" fill="none" stroke="var(--color-ink)" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M13 6 L5 12 L13 18" fill="none" stroke="var(--color-ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <svg
+            aria-hidden
+            viewBox="0 0 36 30"
+            className="-mt-3 shrink-0"
+            style={{ width: 30, height: 25, filter: "url(#inkRough)" }}
+        >
+            <path
+                d="M28 2 C30.5 9, 29.5 15, 23 18.2 C18.5 20.3, 13 20.5 8 20.5"
+                fill="none"
+                stroke="var(--color-ink)"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+            />
+            <path
+                d="M14.5 14.5 L6 20.5 L14.5 26.5"
+                fill="none"
+                stroke="var(--color-ink)"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
         </svg>
     );
 }
