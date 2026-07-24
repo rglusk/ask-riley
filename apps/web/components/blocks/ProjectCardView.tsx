@@ -10,7 +10,8 @@ function InkPencil() {
             width={13}
             height={13}
             className="mt-[3px] shrink-0"
-            style={{ filter: "url(#inkRough)" }}
+            // mirrored so the nib points at the text it annotates
+            style={{ filter: "url(#inkRough)", transform: "scaleX(-1)" }}
         >
             <path
                 d="M4.5 19.5 L6.5 13.8 L16.2 4.1 C17.3 3 19.1 3 20.2 4.1 C21.3 5.2 21.3 7 20.2 8.1 L10.5 17.8 Z"
